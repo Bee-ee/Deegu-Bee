@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)file:///C:/Users/dmsql/AppData/Local/Temp/corneal_pupil_acd_calculator%20(2).html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corneal–Pupil–ACD Calculator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 700px; margin: auto; }
+    input { width: 100%; padding: 8px; margin-top: 4px; margin-bottom: 12px; font-size: 16px; }
+    button { padding: 8px 16px; margin: 4px 6px 12px 0; font-size: 16px; }
+    label { display: block; font-weight: bold; }
+    .result { margin-top: 20px; font-weight: bold; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h2>Corneal–Pupil–ACD Calculator</h2>
+
+  <label>Corneal Radius (r, mm):
+    <input id="r" type="number" step="0.1" value="7.8">
+  </label>
+
+  <label>Anterior Chamber Depth (ACD, mm):
+    <input id="acd" type="number" step="0.1" value="2.8">
+  </label>
+
+  <label>Corneal Zone (mm):
+    <input id="cornealZone" type="number" step="0.1" value="6.0">
+  </label>
+
+  <label>Pupil Size (mm):
+    <input id="pupilSize" type="number" step="0.1" value="">
+  </label>
+
+  <div>
+    <button onclick="calcPupilSize()">Calc Pupil Size</button>
+    <button onclick="calcCornealZone()">Calc Corneal Zone</button>
+    <button onclick="calcACD()">Calc ACD</button>
+    <button onclick="estimateMaxCornealFromR()">Max Corneal Zone from r</button>
+  </div>
+
+  <div id="result" class="result"></div>
+
+  <script>
+    const n1 = 1.0;
+    const n2 = 1.336;
+
+    function calcPupilSize() {
+      const r = parseFloat(document.getElementById('r').value);
+      const acd = parseFloat(document.getElementById('acd').value);
+      const cz = parseFloat(document.getElementById('cornealZone').value);
+      const h0 = cz / 2;
+      const theta1 = Math.asin(h0 / r);
+      const theta2 = Math.asin((n1 / n2) * Math.sin(theta1));
+      const hi = acd * Math.tan(theta2);
+      const pupilSize = 2 * hi;
+      document.getElementById('result').innerText = `Pupil Size ≈ ${pupilSize.toFixed(1)} mm`;
+    }
+
+    function calcCornealZone() {
+      const r = parseFloat(document.getElementById('r').value);
+      const acd = parseFloat(document.getElementById('acd').value);
+      const ps = parseFloat(document.getElementById('pupilSize').value);
+      const hi = ps / 2;
+      const theta2 = Math.atan(hi / acd);
+      const theta1 = Math.asin((n2 / n1) * Math.sin(theta2));
+      const h0 = r * Math.sin(theta1);
+      const cz = 2 * h0;
+      document.getElementById('result').innerText = `Corneal Zone ≈ ${cz.toFixed(1)} mm`;
+    }
+
+    function calcACD() {
+      const r = parseFloat(document.getElementById('r').value);
+      const ps = parseFloat(document.getElementById('pupilSize').value);
+      const cz = parseFloat(document.getElementById('cornealZone').value);
+      const h0 = cz / 2;
+      const theta1 = Math.asin(h0 / r);
+      const theta2 = Math.asin((n1 / n2) * Math.sin(theta1));
+      const acd = (ps / 2) / Math.tan(theta2);
+      document.getElementById('result').innerText = `ACD ≈ ${acd.toFixed(1)} mm`;
+    }
+
+    function estimateMaxCornealFromR() {
+      const r = parseFloat(document.getElementById('r').value);
+      const theta = Math.asin((n1 / n2) * Math.sin(Math.asin(1)));
+      const h0 = r * Math.sin(theta);
+      const cz = 2 * h0;
+      document.getElementById('result').innerText = `Estimated Max Corneal Zone from r ≈ ${cz.toFixed(1)} mm`;
+    }
+  </script>
+
+
+</body></html>
